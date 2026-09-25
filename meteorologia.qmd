@@ -1,0 +1,366 @@
+---
+title: "Tarea clase programación"
+format: html
+editor: visual
+---
+
+1.  Escribe el código necesario para descargar los archivos y guardalos en la carpeta `datos` de tu proyecto. Utiliza las url provistas en el listado. Piensa en nombres adecuados para tus archivos segun lo que vimos en el segundo capitulo.
+
+2.  Lee los datos descargados, para eso revisa la ayuda de la funcion `read_csv`()\`.
+
+3.  Explora la estructura de los data.frames con la función [`str()`](https://rdrr.io/r/utils/str.html). También podés usar `glimpse()` del paquete `dplyr`
+
+- ¿Cuántas columnas tiene cada tabla? ¿son todas iguales?
+
+- ¿Qué tipo de dato hay en cada columna? ¿el tipo de dato es correcto según el contenido que vez?
+
+- ¿Cuántos registros hay que cada data frame?
+
+# Capitulo 4
+
+```{r}
+library(readr)
+library(dplyr)
+
+url_metadatos = "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv"
+  
+destino_metadatos = "datos/metadatos.csv"
+  
+download.file(url = url_metadatos , destfile = destino_metadatos)
+
+metadatos = read.csv(destino_metadatos)
+
+#3
+#a
+ncol(metadatos)
+#b
+glimpse(metadatos)
+#c
+nrow(metadatos)
+```
+
+```{r}
+#1
+library(readr)
+library(dplyr)
+url_metadatos = "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv"
+
+metadatos_archivo = "datos/metadatos_completos.csv"
+
+download.file(url = url_metadatos, destfile = metadatos_archivo)
+
+metadatos <- read.csv(metadatos_archivo)
+
+#3
+glimpse(metadatos)
+
+#a,b,c
+nrow(metadatos)
+ncol(metadatos)
+
+```
+
+```{r}
+url_2 ="https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0472.csv"
+
+archivo_2 = "datos/NH0472.csv"
+
+download.file(url = url_2, destfile = archivo_2)
+
+datos_2 = read.csv(archivo_2)
+
+#3
+glimpse(datos_2)
+
+#a,b,c
+nrow(datos_2)
+ncol(datos_2)
+```
+
+```{r}
+url_3= "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0910.csv"
+
+archivo_3 = "datos/NH0910.csv"
+
+download.file(url = url_3, destfile = archivo_3)
+
+datos_3 = read.csv(archivo_3)
+
+#3
+glimpse(datos_3)
+
+#a,b,c
+nrow(datos_3)
+ncol(datos_3)
+```
+
+```{r}
+url_4= "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0046.csv"
+
+archivo_4 = "datos/NH0046.csv"
+
+download.file(url = url_4, destfile = archivo_4)
+
+datos_4 = read.csv(archivo_4)
+
+#3
+glimpse(datos_4)
+
+#a,b,c
+nrow(datos_4)
+ncol(datos_4)
+```
+
+```{r}
+url_5= "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0098.csv"
+
+archivo_5 = "datos/NH0098.csv"
+
+download.file(url = url_5, destfile = archivo_5)
+
+datos_5 = read.csv(archivo_5)
+
+#3
+glimpse(datos_5)
+
+#a,b,c
+nrow(datos_5)
+ncol(datos_5)
+```
+
+```{r}
+url_6= "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0437.csv"
+
+archivo_6 = "datos/NH0437.csv"
+
+download.file(url = url_6, destfile = archivo_6)
+
+datos_6 = read.csv(archivo_6)
+
+#3
+glimpse(datos_6)
+
+#a,b,c
+nrow(datos_6)
+ncol(datos_6)
+```
+
+# Capitulo  5
+
+```{r}
+nuevo_nombre <- rbind(datos_2, datos_3, datos_4, datos_5, datos_6)
+```
+
+1.  ¿Cuántas observaciones de temperatura se hicieron en cada estación?
+
+```{r}
+#1
+nrow(nuevo_nombre)
+nuevo_nombre |>
+  group_by(id)|>
+  summarise(cantidad = n())
+  
+```
+
+1.  ¿Cuál es la temperatura mínima registrada y la máxima registrada en cada estación?
+
+```{r}
+#2
+nuevo_nombre |>
+  group_by(id) |>
+  summarise(
+    temp_minima = min(temperatura_abrigo_150cm_minima, na.rm = TRUE),
+    temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE)
+  )
+
+```
+
+¿Cuál es el promedio de la temperatura de abrigo a 150 cm en cada estación? ¿Y el desvío estandar?
+
+```{r}
+#3
+nuevo_nombre |>
+  group_by(id) |>
+  summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE),
+            desviacion = sd(velocidad_viento_200cm_media, na.rm = TRUE))
+```
+
+¿Cuál es la proporción de `NA` en temperatura de abrigo a 150 cm?
+
+```{r}
+#4
+cantidad = sum(is.na(nuevo_nombre$temperatura_abrigo_150cm))
+
+promedio = cantidad/nrow(nuevo_nombre )
+```
+
+Cuál es el promedio anual de la temperatura de abrigo a 150 cm en cada estación? Pista, podés extraer el año de la variable `fecha` con anio = `year(fecha)` y usar esa nueva variable para agrupar los datos.
+
+```{r}
+library(lubridate)
+
+nuevo_nombre |>
+  mutate(anio = year(fecha)) |>
+  group_by(id, anio) |>
+  summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE))
+```
+
+1.  ¿Cuál es la precipitación acumulada mensual en cada estación? Pista: la precipitación acumulada mensual es la *suma* de la precipitación en cada mes. En este caso necesitas agrupar los datos por año y mes, una posibilidad es usar `floor_date(fecha, "month")`.
+
+```{r}
+nuevo_nombre |>
+  mutate(fecha = ymd(fecha)) |> #convierto a fecha con ymd
+  mutate(aniomes = floor_date(fecha, "month")) |>
+  group_by(id, aniomes) |>
+  summarise(precipitacion_mensual = sum(precipitacion_pluviometrica, na.rm = TRUE))
+```
+
+# Capitulo 7
+
+ejercicio trasversal
+
+```{r}
+library(ggplot2)
+```
+
+nuevo_nombre \|\>
+
+filter(id == "NH0437") \|\>
+
+ggplot(aes(x = anio, y = promedio_temp)) +
+
+geom_line()
+
+```{r}
+#1
+library(lubridate)
+
+
+estaciones <- nuevo_nombre |>
+  mutate(fecha=ymd(fecha))
+
+
+filter(estaciones, id== "NH0437") |>
+  ggplot(aes(x=fecha,y=temperatura_abrigo_150cm))+
+  geom_line()+
+  geom_line(method="lm")
+```
+
+```{r}
+#2
+library(lubridate)
+
+promedio_mensual <- nuevo_nombre |>
+  mutate(mes = month(fecha)) |>
+  group_by(id, mes) |>
+  summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE))
+
+promedio_mensual |>
+  ggplot(aes(x = mes, y = promedio_temp, color = id)) +
+  geom_line()
+```
+
+```{r}
+#3
+ggplot(data = nuevo_nombre)+
+  aes(x = humedad_media_8_14_20, y = temperatura_abrigo_150cm)+
+  geom_point()
+```
+
+```{r}
+#3 cambiando el orden de las variables
+ggplot(data = nuevo_nombre)+
+  aes(x = temperatura_abrigo_150cm, y = humedad_media_8_14_20)+
+  geom_point()
+```
+
+# Capitulo 8
+
+Recordás el ejercicio 3 de dplyr?
+
+> ¿Cuál es el promedio de la temperatura de abrigo a 150 cm en cada estación? ¿Y el desvío estandar? Pista: la mayoría de las funciones tienen un argumento para *sacar* los `NA` del cálculo, revisá la documentación de [`mean()`](https://rdrr.io/r/base/mean.html) y de [`sd()`](https://rdrr.io/r/stats/sd.html).
+
+1.  Usando las funciones `pivot_` alargá el resultado anterior de tal manera que queden los valores de temperatura máxima y mínima en la misma columna.
+
+2.  A continuación **usando el resultado anterior** volvé a ensanchar la tabla de tal manera que tengas columnas con los nombres de las estaciones y en las filas los valores de la media y el desvio estandar.
+
+**uniones**
+
+A la hora de analizar datos meteorológicos, tener en cuenta la ubicación y altitud de las estaciones donde se toman las mediciones es muy importane. Sin embargo eso no está incluido en los datos con los que venimos trabajando.
+
+Esta información son **metadatos** y suelen venir por separado (si tenemos suerte!). En este caso los tenemos y están disponibles en <https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv>.
+
+1.  Lee los metadatos
+
+2.  Identifica cuales son las variables clave, aquellas que son comunes entre los datos meteorológicos con los que venís trabajando y esta nueva tabla.
+
+3.  Uní los datos con joins. ¿Cuál es la mejor opción?
+
+```{r}
+library("tidyr")
+ejercicio_3_sd_y_promedio = nuevo_nombre |>
+  group_by(id) |>
+  summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE),
+            desviacion = sd(velocidad_viento_200cm_media, na.rm = TRUE))
+```
+
+```{r}
+ejercicio_3 = nuevo_nombre |>
+  group_by(id) |>
+  summarise(Max = max(temperatura_abrigo_150cm, na.rm = TRUE),
+            Min = min(temperatura_abrigo_150cm, na.rm = TRUE))
+```
+
+```{r}
+#1
+ejercicio_1.8 = pivot_longer(ejercicio_3,
+                           cols = c("Max","Min"),
+                           
+                           names_to = "Temperaturas",
+                           values_to = "Valores temperatura")
+```
+
+```{r}
+#2
+uno_bases = full_join(ejercicio_3, ejercicio_3_sd_y_promedio, by = "id")
+
+ejercicio_largo = pivot_longer(uno_bases,
+                               cols = c("Max", "Min", "promedio_temp", "desviacion"),
+                               names_to = "medida",
+                               values_to = "valor")
+
+ejercicio_final = pivot_wider(ejercicio_largo,
+                              names_from = id,
+                              values_from = valor)
+```
+
+```{r}
+library("readr")
+metadatos_completos = read.csv("https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv")
+```
+
+2.  Las variables claves son el id y quizás la fecha por como lo miremos, porque puede ser que la fecha de metadatos puede ser desde cuando está operando la base y en este nuevo data set, te dice operando desde
+
+```{r}
+completo = full_join(metadatos_completos,nuevo_nombre,by = "id")
+```
+
+```{r}
+derecha = right_join(metadatos_completos,nuevo_nombre, by = "id")
+```
+
+```{r}
+izq = left_join(metadatos_completos,nuevo_nombre, by = "id")
+```
+
+```{r}
+interseccion = inner_join(metadatos_completos,nuevo_nombre, by = "id")
+```
+
+```{r}
+anti = anti_join(metadatos_completos,nuevo_nombre, by = "id")
+```
+
+Me parece que la más útil acá porque son bases totalmente distintas, y la verdad, no varía mucho, creo que el full join es la mejor opción porque conserva todos los datis
+
+
