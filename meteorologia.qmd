@@ -361,6 +361,89 @@ interseccion = inner_join(metadatos_completos,nuevo_nombre, by = "id")
 anti = anti_join(metadatos_completos,nuevo_nombre, by = "id")
 ```
 
-Me parece que la más útil acá porque son bases totalmente distintas, y la verdad, no varía mucho, creo que el full join es la mejor opción porque conserva todos los datis
+Me parece que la más útil acá porque son bases totalmente distintas, y la verdad, no varía mucho, creo que el full join es la mejor opción porque conserva todos los datos
+
+# Capitulo 9
+
+Crea una función para descagar y leer los datos de estaciones. Importante:
+Usá como base la función que creamos para leer los datos de pinguinos.
+La función deberá recibir 2 argumentos, el id de la estación (por ejemplo “NH0437”) y la ruta donde se guardará el archivo (por ejemplo “datos/NH0437.csv”)
+Debe poder descargar y leer los datos de cualquier estación.
+
+```{r}
+leer_datos <- function(id_estacion, destino){
+  url <- paste0("datos/", id_estacion, ".csv")
+  download.file(url = id_estacion, destfile = destino)
+  read_csv(destino)
+}
+```
+
+Crea una función que se llame tabla_resumen_temperatura y que devuelva una tabla de resumen de la temperatura_abrigo_150cm para una o más estaciones. Usá el código que generaste en el ejercicio 1 de tidyr.
+
+
+
+```{r}
+tabla_resumen_temperatura <- function(x) {
+  
+  if (length(x) == 1) {
+    nuevo_nombre |>
+      filter(id == x) |>
+      summarise(
+        temp_minima = min(temperatura_abrigo_150cm_minima, na.rm = TRUE),
+        temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE)
+      )
+    
+  } else {
+    nuevo_nombre |>
+      filter(id %in% x) |>
+      group_by(id) |>
+      summarise(
+        temp_minima = min(temperatura_abrigo_150cm_minima, na.rm = TRUE),
+        temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE)
+      )
+  }
+}
+```
+
+Generá una función grafico_temperatura_mensual que devuelva un gráfico que muestre el promedio mensual de la temperatura de abrigo. usá el código que generaste para el ejercicio 2 de ggplot2. La función debe:
+Recibir el data.frame con los datos (que pueden ser de 1 o más estaciones).
+Tener un argumento para indicarle que colores debe usar para el gráfico.
+Tener un argumento para definir el título del gráfico. Por defecto, si no se define el título deberá aparecer “Temperatura”
+Desafio extra (opcional): modificá la función para que si no le pasas los colores necesarios, elija colores de manera aleatoria. Pista: revisá colors()
+
+```{r}
+library(lubridate)
+ej_cap9.3 <-nuevo_nombre %>%
+  mutate(fecha = ymd(fecha)) %>%
+  mutate(mes = month(fecha)) %>%
+  group_by(mes,id) %>%
+  summarise(prom = mean(temperatura_abrigo_150cm, na.rm = TRUE))
+
+grafico_temperatura_mensual <- function(datos, id_estacion, colores = NULL, titulo = "Temperatura") { #Poner el id como string cuando se llame la función
+  
+  # Filtra internamente por el id que le pasaste
+  datos_filtrados <- filter(datos, id == id_estacion)
+  
+  if (is.null(colores)) {
+    n_estaciones <- length(unique(datos_filtrados$id))
+    colores <- sample(colors(), n_estaciones)
+  }
+  
+  ggplot(data = datos_filtrados,
+         aes(x = mes, y = prom, color = id)) +
+    geom_line() +
+    scale_color_manual(values = colores) +
+    labs(
+      x = "mes",
+      y = "promedio",
+      title = titulo
+    )
+}
+
+```
+
+
+
+
 
 
