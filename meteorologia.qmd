@@ -1,55 +1,48 @@
 ---
-title: "Tarea clase programación"
+title: "Ejercicios trasnversales"
 format: html
 editor: visual
 ---
+# Librerías a usar 
+```{r}
+library(readr)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyr)
+```
 
-1.  Escribe el código necesario para descargar los archivos y guardalos en la carpeta `datos` de tu proyecto. Utiliza las url provistas en el listado. Piensa en nombres adecuados para tus archivos segun lo que vimos en el segundo capitulo.
-
-2.  Lee los datos descargados, para eso revisa la ayuda de la funcion `read_csv`()\`.
-
-3.  Explora la estructura de los data.frames con la función [`str()`](https://rdrr.io/r/utils/str.html). También podés usar `glimpse()` del paquete `dplyr`
-
-- ¿Cuántas columnas tiene cada tabla? ¿son todas iguales?
-
-- ¿Qué tipo de dato hay en cada columna? ¿el tipo de dato es correcto según el contenido que vez?
-
-- ¿Cuántos registros hay que cada data frame?
 
 # Capitulo 4
 
-```{r}
-library(readr)
-library(dplyr)
+A lo largo del curso vamos a construir y probar paquete de R que nos permita trabajar y analizar datos de estaciones meteorológicas. El objetivo de este ejercicio es que comiences a familiarizarte con estos datos.
 
-url_metadatos = "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv"
-  
-destino_metadatos = "datos/metadatos.csv"
-  
-download.file(url = url_metadatos , destfile = destino_metadatos)
+Utilizaremos datos que diponibiliza el Institulo Nacional de Tecnología Agropecuaria INTA a traves del Sistema de Información y Gestión Agropecuaria SIGA. Por ahora y para practicar lo que vimos en esta sección, usaremos una parte de esos datos que guardamos en un repositorio.
 
-metadatos = read.csv(destino_metadatos)
+Metadatos: https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv
+Estación NH0472: https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0472.csv
+Estación NH0910: https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0910.csv
+Estación NH0046: https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0046.csv
+Estación NH0098: https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0098.csv
+Estación NH0437: https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/NH0437.csv
+Escribe el código necesario para descargar los archivos y guardalos en la carpeta datos de tu proyecto. Utiliza las url provistas en el listado. Piensa en nombres adecuados para tus archivos segun lo que vimos en el segundo capitulo.
 
-#3
-#a
-ncol(metadatos)
-#b
-glimpse(metadatos)
-#c
-nrow(metadatos)
-```
+Lee los datos descargados, para eso revisa la ayuda de la funcion read_csv()`.
 
+Explora la estructura de los data.frames con la función str(). También podés usar glimpse() del paquete dplyr
+
+¿Cuántas columnas tiene cada tabla? ¿son todas iguales?
+¿Qué tipo de dato hay en cada columna? ¿el tipo de dato es correcto según el contenido que vez?
+¿Cuántos registros hay que cada data frame?
 ```{r}
 #1
-library(readr)
-library(dplyr)
 url_metadatos = "https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv"
 
 metadatos_archivo = "datos/metadatos_completos.csv"
 
 download.file(url = url_metadatos, destfile = metadatos_archivo)
 
-metadatos <- read.csv(metadatos_archivo)
+metadatos <- read_csv(metadatos_archivo)
 
 #3
 glimpse(metadatos)
@@ -67,7 +60,7 @@ archivo_2 = "datos/NH0472.csv"
 
 download.file(url = url_2, destfile = archivo_2)
 
-datos_2 = read.csv(archivo_2)
+datos_2 = read_csv(archivo_2)
 
 #3
 glimpse(datos_2)
@@ -84,7 +77,7 @@ archivo_3 = "datos/NH0910.csv"
 
 download.file(url = url_3, destfile = archivo_3)
 
-datos_3 = read.csv(archivo_3)
+datos_3 = read_csv(archivo_3)
 
 #3
 glimpse(datos_3)
@@ -101,7 +94,7 @@ archivo_4 = "datos/NH0046.csv"
 
 download.file(url = url_4, destfile = archivo_4)
 
-datos_4 = read.csv(archivo_4)
+datos_4 = read_csv(archivo_4)
 
 #3
 glimpse(datos_4)
@@ -118,7 +111,7 @@ archivo_5 = "datos/NH0098.csv"
 
 download.file(url = url_5, destfile = archivo_5)
 
-datos_5 = read.csv(archivo_5)
+datos_5 = read_csv(archivo_5)
 
 #3
 glimpse(datos_5)
@@ -135,7 +128,7 @@ archivo_6 = "datos/NH0437.csv"
 
 download.file(url = url_6, destfile = archivo_6)
 
-datos_6 = read.csv(archivo_6)
+datos_6 = read_csv(archivo_6)
 
 #3
 glimpse(datos_6)
@@ -145,8 +138,12 @@ nrow(datos_6)
 ncol(datos_6)
 ```
 
-# Capitulo  5
+# Capitulo 5
+Ahora que ya tenés las herramientas para manipular y transformar datos ordenados, es hora de familiarizarte más con los datos de las estaciones meteorológicas.
 
+Te proponemos responder a las siguientes preguntas manipulando los datos con los verbos de dplyr que vimos hasta ahora. Pero seguramente necesites nuevas funciones, te iremos dando pistas en el camino.
+
+Pero antes de eso, sería útil tener todos los datos de las estaciones en un solo data.frame. Seguramente los leiste por separado y cada uno tiene un nombre distinto. La función rbind() permite unir data.frames uno debajo del otro. Usá el siguiente código y completalo para generar un data.frame con los datos de todas las estaciones.
 ```{r}
 nuevo_nombre <- rbind(datos_2, datos_3, datos_4, datos_5, datos_6)
 ```
@@ -182,32 +179,31 @@ nuevo_nombre |>
 nuevo_nombre |>
   group_by(id) |>
   summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE),
-            desviacion = sd(velocidad_viento_200cm_media, na.rm = TRUE))
+            desviacion = sd(temperatura_abrigo_150cm, na.rm = TRUE))
 ```
 
 ¿Cuál es la proporción de `NA` en temperatura de abrigo a 150 cm?
 
 ```{r}
 #4
-cantidad = sum(is.na(nuevo_nombre$temperatura_abrigo_150cm))
-
-promedio = cantidad/nrow(nuevo_nombre )
+nuevo_nombre %>%
+  summarise(prop_na = mean(is.na(temperatura_abrigo_150cm)))
 ```
 
 Cuál es el promedio anual de la temperatura de abrigo a 150 cm en cada estación? Pista, podés extraer el año de la variable `fecha` con anio = `year(fecha)` y usar esa nueva variable para agrupar los datos.
 
 ```{r}
-library(lubridate)
-
+#5
 nuevo_nombre |>
   mutate(anio = year(fecha)) |>
   group_by(id, anio) |>
   summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE))
 ```
 
-1.  ¿Cuál es la precipitación acumulada mensual en cada estación? Pista: la precipitación acumulada mensual es la *suma* de la precipitación en cada mes. En este caso necesitas agrupar los datos por año y mes, una posibilidad es usar `floor_date(fecha, "month")`.
+¿Cuál es la precipitación acumulada mensual en cada estación? Pista: la precipitación acumulada mensual es la *suma* de la precipitación en cada mes. En este caso necesitas agrupar los datos por año y mes, una posibilidad es usar `floor_date(fecha, "month")`.
 
 ```{r}
+#6
 nuevo_nombre |>
   mutate(fecha = ymd(fecha)) |> #convierto a fecha con ymd
   mutate(aniomes = floor_date(fecha, "month")) |>
@@ -217,25 +213,10 @@ nuevo_nombre |>
 
 # Capitulo 7
 
-ejercicio trasversal
-
-```{r}
-library(ggplot2)
-```
-
-nuevo_nombre \|\>
-
-filter(id == "NH0437") \|\>
-
-ggplot(aes(x = anio, y = promedio_temp)) +
-
-geom_line()
+Graficá la temperatura de abierto para la estación NH0437 (tendrías que filtrar los datos para quedarte solo con esta estación). Sumá una regresión lineal, ¿se mentiene constante la temperatura media con el tiempo o cambia?
 
 ```{r}
 #1
-library(lubridate)
-
-
 estaciones <- nuevo_nombre |>
   mutate(fecha=ymd(fecha))
 
@@ -243,23 +224,21 @@ estaciones <- nuevo_nombre |>
 filter(estaciones, id== "NH0437") |>
   ggplot(aes(x=fecha,y=temperatura_abrigo_150cm))+
   geom_line()+
-  geom_line(method="lm")
+  geom_smooth(method="lm")
 ```
 
+Calculá el promedio mensual de la temperatura de abrigo para cada estación y gráfica el resultado. El gráfico podría tener más o menos esta pinta:
 ```{r}
 #2
-library(lubridate)
-
-promedio_mensual <- nuevo_nombre |>
+nuevo_nombre |>
   mutate(mes = month(fecha)) |>
   group_by(id, mes) |>
-  summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE))
-
-promedio_mensual |>
+  summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE))%>%
   ggplot(aes(x = mes, y = promedio_temp, color = id)) +
   geom_line()
 ```
 
+¿Cuál es la relación entre la temperatura de abrigo y la humedad? Hacé un gráfico de puntos que muestrea la relación, podés sumar un suavisado (opcional). Para la humedad utilizá la variable humedad_media_8_14_20.
 ```{r}
 #3
 ggplot(data = nuevo_nombre)+
@@ -297,28 +276,24 @@ Esta información son **metadatos** y suelen venir por separado (si tenemos suer
 3.  Uní los datos con joins. ¿Cuál es la mejor opción?
 
 ```{r}
-library("tidyr")
 ejercicio_3_sd_y_promedio = nuevo_nombre |>
   group_by(id) |>
   summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE),
-            desviacion = sd(velocidad_viento_200cm_media, na.rm = TRUE))
+            desviacion = sd(temperatura_abrigo_150cm, na.rm = TRUE))
 ```
 
 ```{r}
 ejercicio_3 = nuevo_nombre |>
   group_by(id) |>
   summarise(Max = max(temperatura_abrigo_150cm, na.rm = TRUE),
-            Min = min(temperatura_abrigo_150cm, na.rm = TRUE))
-```
-
-```{r}
-#1
-ejercicio_1.8 = pivot_longer(ejercicio_3,
-                           cols = c("Max","Min"),
+            Min = min(temperatura_abrigo_150cm, na.rm = TRUE)) %>%
+  pivot_longer(cols = c("Max","Min"),
                            
                            names_to = "Temperaturas",
                            values_to = "Valores temperatura")
+  
 ```
+
 
 ```{r}
 #2
@@ -335,52 +310,48 @@ ejercicio_final = pivot_wider(ejercicio_largo,
 ```
 
 ```{r}
-library("readr")
-metadatos_completos = read.csv("https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv")
+metadatos_completos = read_csv("https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv")
 ```
 
 2.  Las variables claves son el id y quizás la fecha por como lo miremos, porque puede ser que la fecha de metadatos puede ser desde cuando está operando la base y en este nuevo data set, te dice operando desde
 
 ```{r}
-completo = full_join(metadatos_completos,nuevo_nombre,by = "id")
+full_join(metadatos_completos,nuevo_nombre,by = "id")
 ```
 
 ```{r}
-derecha = right_join(metadatos_completos,nuevo_nombre, by = "id")
+right_join(metadatos_completos,nuevo_nombre, by = "id")
 ```
 
 ```{r}
-izq = left_join(metadatos_completos,nuevo_nombre, by = "id")
+left_join(metadatos_completos,nuevo_nombre, by = "id")
 ```
 
 ```{r}
-interseccion = inner_join(metadatos_completos,nuevo_nombre, by = "id")
+inner_join(metadatos_completos,nuevo_nombre, by = "id")
 ```
 
 ```{r}
-anti = anti_join(metadatos_completos,nuevo_nombre, by = "id")
+anti_join(metadatos_completos,nuevo_nombre, by = "id")
 ```
 
 Me parece que la más útil acá porque son bases totalmente distintas, y la verdad, no varía mucho, creo que el full join es la mejor opción porque conserva todos los datos
 
 # Capitulo 9
 
-Crea una función para descagar y leer los datos de estaciones. Importante:
-Usá como base la función que creamos para leer los datos de pinguinos.
-La función deberá recibir 2 argumentos, el id de la estación (por ejemplo “NH0437”) y la ruta donde se guardará el archivo (por ejemplo “datos/NH0437.csv”)
-Debe poder descargar y leer los datos de cualquier estación.
+Crea una función para descagar y leer los datos de estaciones. 
+
+Importante: Usá como base la función que creamos para leer los datos de pinguinos. La función deberá recibir 2 argumentos, el id de la estación (por ejemplo “NH0437”) y la ruta donde se guardará el archivo (por ejemplo “datos/NH0437.csv”) Debe poder descargar y leer los datos de cualquier estación.
 
 ```{r}
 leer_datos <- function(id_estacion, destino){
-  url <- paste0("datos/", id_estacion, ".csv")
-  download.file(url = id_estacion, destfile = destino)
+  url <- paste0("https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/", id_estacion, ".csv")
+  download.file(url = url, destfile = destino)
   read_csv(destino)
 }
 ```
 
 Crea una función que se llame tabla_resumen_temperatura y que devuelva una tabla de resumen de la temperatura_abrigo_150cm para una o más estaciones. Usá el código que generaste en el ejercicio 1 de tidyr.
-
-
 
 ```{r}
 tabla_resumen_temperatura <- function(x) {
@@ -405,11 +376,7 @@ tabla_resumen_temperatura <- function(x) {
 }
 ```
 
-Generá una función grafico_temperatura_mensual que devuelva un gráfico que muestre el promedio mensual de la temperatura de abrigo. usá el código que generaste para el ejercicio 2 de ggplot2. La función debe:
-Recibir el data.frame con los datos (que pueden ser de 1 o más estaciones).
-Tener un argumento para indicarle que colores debe usar para el gráfico.
-Tener un argumento para definir el título del gráfico. Por defecto, si no se define el título deberá aparecer “Temperatura”
-Desafio extra (opcional): modificá la función para que si no le pasas los colores necesarios, elija colores de manera aleatoria. Pista: revisá colors()
+Generá una función grafico_temperatura_mensual que devuelva un gráfico que muestre el promedio mensual de la temperatura de abrigo. usá el código que generaste para el ejercicio 2 de ggplot2. La función debe: Recibir el data.frame con los datos (que pueden ser de 1 o más estaciones). Tener un argumento para indicarle que colores debe usar para el gráfico. Tener un argumento para definir el título del gráfico. Por defecto, si no se define el título deberá aparecer “Temperatura” Desafio extra (opcional): modificá la función para que si no le pasas los colores necesarios, elija colores de manera aleatoria. Pista: revisá colors()
 
 ```{r}
 library(lubridate)
@@ -441,9 +408,3 @@ grafico_temperatura_mensual <- function(datos, id_estacion, colores = NULL, titu
 }
 
 ```
-
-
-
-
-
-
