@@ -300,11 +300,11 @@ ejercicio_3 = nuevo_nombre |>
 uno_bases = full_join(ejercicio_3, ejercicio_3_sd_y_promedio, by = "id")
 
 ejercicio_largo = pivot_longer(uno_bases,
-                               cols = c("Max", "Min", "promedio_temp", "desviacion"),
+                               cols = c("Valores temperatura", "promedio_temp", "desviacion"),
                                names_to = "medida",
                                values_to = "valor")
 
-ejercicio_final = pivot_wider(ejercicio_largo,
+pivot_wider(ejercicio_largo,
                               names_from = id,
                               values_from = valor)
 ```
@@ -335,7 +335,7 @@ inner_join(metadatos_completos,nuevo_nombre, by = "id")
 anti_join(metadatos_completos,nuevo_nombre, by = "id")
 ```
 
-Me parece que la más útil acá porque son bases totalmente distintas, y la verdad, no varía mucho, creo que el full join es la mejor opción porque conserva todos los datos
+Me parece que si el objetivo es "analizar los datos de mis 5 estaciones con su información de ubicación/altitud", left_join con nuevo_nombre como base izquierda es más preciso que full_join. El full_join solo tendría sentido si quisieras conservar también los metadatos de estaciones sin datos meteorológicos, cosa que normalmente no aporta nada al análisis.
 
 # Capitulo 9
 
@@ -355,56 +355,41 @@ Crea una función que se llame tabla_resumen_temperatura y que devuelva una tabl
 
 ```{r}
 tabla_resumen_temperatura <- function(x) {
-  
-  if (length(x) == 1) {
-    nuevo_nombre |>
-      filter(id == x) |>
-      summarise(
-        temp_minima = min(temperatura_abrigo_150cm_minima, na.rm = TRUE),
-        temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE)
-      )
-    
-  } else {
-    nuevo_nombre |>
-      filter(id %in% x) |>
-      group_by(id) |>
-      summarise(
-        temp_minima = min(temperatura_abrigo_150cm_minima, na.rm = TRUE),
-        temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE)
-      )
-  }
+  nuevo_nombre |>
+    filter(id %in% x) |>
+    group_by(id) |>
+    summarise(
+      temp_minima = min(temperatura_abrigo_150cm_minima, na.rm = TRUE),
+      temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE)
+    )
 }
 ```
 
 Generá una función grafico_temperatura_mensual que devuelva un gráfico que muestre el promedio mensual de la temperatura de abrigo. usá el código que generaste para el ejercicio 2 de ggplot2. La función debe: Recibir el data.frame con los datos (que pueden ser de 1 o más estaciones). Tener un argumento para indicarle que colores debe usar para el gráfico. Tener un argumento para definir el título del gráfico. Por defecto, si no se define el título deberá aparecer “Temperatura” Desafio extra (opcional): modificá la función para que si no le pasas los colores necesarios, elija colores de manera aleatoria. Pista: revisá colors()
 
 ```{r}
-library(lubridate)
-ej_cap9.3 <-nuevo_nombre %>%
-  mutate(fecha = ymd(fecha)) %>%
-  mutate(mes = month(fecha)) %>%
-  group_by(mes,id) %>%
-  summarise(prom = mean(temperatura_abrigo_150cm, na.rm = TRUE))
-
-grafico_temperatura_mensual <- function(datos, id_estacion, colores = NULL, titulo = "Temperatura") { #Poner el id como string cuando se llame la función
+grafico_temperatura_mensual <- function(ids, colores = NULL, titulo = "Temperatura") {
   
-  # Filtra internamente por el id que le pasaste
-  datos_filtrados <- filter(datos, id == id_estacion)
+  datos <- nuevo_nombre |>
+    mutate(fecha = ymd(fecha)) |>
+    mutate(mes = month(fecha)) |>
+    filter(id %in% ids) |>
+    group_by(mes, id) |>
+    summarise(prom = mean(temperatura_abrigo_150cm, na.rm = TRUE))
   
   if (is.null(colores)) {
-    n_estaciones <- length(unique(datos_filtrados$id))
+    n_estaciones <- length(unique(datos$id))
     colores <- sample(colors(), n_estaciones)
   }
   
-  ggplot(data = datos_filtrados,
-         aes(x = mes, y = prom, color = id)) +
+  ggplot(datos, aes(x = mes, y = prom, color = id)) +
     geom_line() +
     scale_color_manual(values = colores) +
-    labs(
-      x = "mes",
-      y = "promedio",
-      title = titulo
-    )
+    labs(x = "mes", y = "promedio", title = titulo)
 }
-
 ```
+
+```{r}
+grafico_temperatura_mensual(c("NH0472","NH0910"))
+```
+
