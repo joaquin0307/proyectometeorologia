@@ -389,7 +389,5 @@ grafico_temperatura_mensual <- function(ids, colores = NULL, titulo = "Temperatu
 }
 ```
 
-```{r}
-grafico_temperatura_mensual(c("NH0472","NH0910"))
-```
+
 
