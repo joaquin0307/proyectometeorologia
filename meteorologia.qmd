@@ -217,15 +217,14 @@ Graficá la temperatura de abierto para la estación NH0437 (tendrías que filtr
 
 ```{r}
 #1
-estaciones <- nuevo_nombre |>
-  mutate(fecha=ymd(fecha))
-
-
-filter(estaciones, id== "NH0437") |>
+nuevo_nombre |>
+  mutate(fecha=ymd(fecha))%>%
+  filter(id== "NH0437") |>
   ggplot(aes(x=fecha,y=temperatura_abrigo_150cm))+
   geom_line()+
   geom_smooth(method="lm")
 ```
+Como vemos en el gráfico, este tiene un comportamiento lineal a medida que pasa el tiempo.
 
 Calculá el promedio mensual de la temperatura de abrigo para cada estación y gráfica el resultado. El gráfico podría tener más o menos esta pinta:
 ```{r}
@@ -243,13 +242,6 @@ nuevo_nombre |>
 #3
 ggplot(data = nuevo_nombre)+
   aes(x = humedad_media_8_14_20, y = temperatura_abrigo_150cm)+
-  geom_point()
-```
-
-```{r}
-#3 cambiando el orden de las variables
-ggplot(data = nuevo_nombre)+
-  aes(x = temperatura_abrigo_150cm, y = humedad_media_8_14_20)+
   geom_point()
 ```
 
@@ -276,17 +268,13 @@ Esta información son **metadatos** y suelen venir por separado (si tenemos suer
 3.  Uní los datos con joins. ¿Cuál es la mejor opción?
 
 ```{r}
-ejercicio_3_sd_y_promedio = nuevo_nombre |>
-  group_by(id) |>
-  summarise(promedio_temp = mean(temperatura_abrigo_150cm, na.rm = TRUE),
-            desviacion = sd(temperatura_abrigo_150cm, na.rm = TRUE))
-```
-
-```{r}
-ejercicio_3 = nuevo_nombre |>
+#1
+nuevo_nombre |>
   group_by(id) |>
   summarise(Max = max(temperatura_abrigo_150cm, na.rm = TRUE),
-            Min = min(temperatura_abrigo_150cm, na.rm = TRUE)) %>%
+            Min = min(temperatura_abrigo_150cm, na.rm = TRUE),
+            prom = mean(temperatura_abrigo_150cm,na.rm = TRUE),
+            desvio = sd(temperatura_abrigo_150cm, na.rm = TRUE)) %>%
   pivot_longer(cols = c("Max","Min"),
                            
                            names_to = "Temperaturas",
@@ -297,23 +285,30 @@ ejercicio_3 = nuevo_nombre |>
 
 ```{r}
 #2
-uno_bases = full_join(ejercicio_3, ejercicio_3_sd_y_promedio, by = "id")
-
-ejercicio_largo = pivot_longer(uno_bases,
-                               cols = c("Valores temperatura", "promedio_temp", "desviacion"),
-                               names_to = "medida",
-                               values_to = "valor")
-
-pivot_wider(ejercicio_largo,
-                              names_from = id,
-                              values_from = valor)
+nuevo_nombre |>
+  group_by(id) |>
+  summarise(Max = max(temperatura_abrigo_150cm, na.rm = TRUE),
+            Min = min(temperatura_abrigo_150cm, na.rm = TRUE),
+            prom = mean(temperatura_abrigo_150cm,na.rm = TRUE),
+            desvio = sd(temperatura_abrigo_150cm, na.rm = TRUE)) %>%
+  pivot_longer(cols = c("Max","Min"),
+                           
+                           names_to = "Temperaturas",
+                           values_to = "Valores temperatura") %>%
+  pivot_longer(cols = c(prom, desvio),
+               names_to = "medida",
+               values_to = "valor") |>
+  pivot_wider(names_from = id,
+              values_from = valor)
+  
 ```
+2.  A la hora de analizar datos meteorológicos, tener en cuenta la ubicación y altitud de las estaciones donde se toman las mediciones es muy importane. Sin embargo eso no está incluido en los datos con los que venimos trabajando.
 
+Esta información son metadatos y suelen venir por separado (si tenemos suerte!). En este caso los tenemos y están disponibles en
 ```{r}
 metadatos_completos = read_csv("https://raw.githubusercontent.com/rse-r/intro-programacion/main/datos/metadatos_completos.csv")
 ```
-
-2.  Las variables claves son el id y quizás la fecha por como lo miremos, porque puede ser que la fecha de metadatos puede ser desde cuando está operando la base y en este nuevo data set, te dice operando desde
+Identifica cuales son las variables clave, aquellas que son comunes entre los datos meteorológicos con los que venís trabajando y esta nueva tabla. Las variables en comun son el id y quizás las fechas, el problema es que en este nuevo conjutnto de metadatos, este tiene dos fechas, fechas desde y hasta. Mientras que, en el conjunto de nuevo nombre solo tengo fecha
 
 ```{r}
 full_join(metadatos_completos,nuevo_nombre,by = "id")
@@ -335,7 +330,7 @@ inner_join(metadatos_completos,nuevo_nombre, by = "id")
 anti_join(metadatos_completos,nuevo_nombre, by = "id")
 ```
 
-Me parece que si el objetivo es "analizar los datos de mis 5 estaciones con su información de ubicación/altitud", left_join con nuevo_nombre como base izquierda es más preciso que full_join. El full_join solo tendría sentido si quisieras conservar también los metadatos de estaciones sin datos meteorológicos, cosa que normalmente no aporta nada al análisis.
+Para nosotros la mejor opción es left_join(nuevo_nombre, metadatos_completos, by = "id"): conserva todas las mediciones y les suma ubicación y altitud. full_join y right_join agregan estaciones de los metadatos sin mediciones (filas con NA) que no sirven para el análisis.
 
 # Capitulo 9
 
@@ -360,7 +355,9 @@ tabla_resumen_temperatura <- function(x) {
     group_by(id) |>
     summarise(
       temp_minima = min(temperatura_abrigo_150cm_minima, na.rm = TRUE),
-      temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE)
+      temp_maxima = max(temperatura_abrigo_150cm_maxima, na.rm = TRUE),
+      promedio = mean(temperatura_abrigo_150cm,na.rm = TRUE),
+      desvio = sd(temperatura_abrigo_150cm,na.rm = TRUE)
     )
 }
 ```
@@ -388,6 +385,8 @@ grafico_temperatura_mensual <- function(ids, colores = NULL, titulo = "Temperatu
     labs(x = "mes", y = "promedio", title = titulo)
 }
 ```
+
+
 
 
 
